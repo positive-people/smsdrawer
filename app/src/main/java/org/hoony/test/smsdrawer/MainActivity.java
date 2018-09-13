@@ -34,7 +34,7 @@ public class MainActivity extends AppCompatActivity {
 
         dataset.add(new MsgModel("곽효림", "바보", "오후 5:40", null));
         dataset.add(new MsgModel("원동훈", "바보", "오후 3:42", null));
-        dataset.add(new MsgModel("현지훈", "천재천재천재천재천재천재천재천재천재천재천재천재천재", "오전 8:02", null));
+        dataset.add(new MsgModel("현지훈", "바보", "오전 8:02", null));
         mMainAdapter = new MyAdapter(dataset);
         mMainRecyclerView.setAdapter(mMainAdapter);
 
