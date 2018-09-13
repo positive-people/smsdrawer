@@ -2,6 +2,8 @@ package org.hoony.test.smsdrawer;
 
 import android.Manifest;
 import android.content.pm.PackageManager;
+import android.graphics.drawable.ShapeDrawable;
+import android.graphics.drawable.shapes.OvalShape;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -54,6 +56,8 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.MyViewHolder> {
         holder.mTextTime.setText(mDataset.get(position).getTime());
         if(mDataset.get(position).getProfile() != null)
             holder.mImageProfile.setImageDrawable(mDataset.get(position).getProfile());
+        holder.mImageProfile.setBackground(new ShapeDrawable(new OvalShape()));
+        holder.mImageProfile.setClipToOutline(true);
     }
 
     public int getItemCount() {
