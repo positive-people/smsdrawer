@@ -67,7 +67,7 @@ public class MainActivity extends AppCompatActivity {
                 Manifest.permission.READ_SMS)
                 == PackageManager.PERMISSION_GRANTED) {
             Uri uri = Uri.parse("content://sms");
-            Cursor mCursor = getContentResolver().query(uri, null, null, null, null);
+            Cursor mCursor = getContentResolver().query(uri, null, ") GROUP BY (address", null, null);
 
             int bodyIndex = mCursor.getColumnIndex("body");
             int addressIndex = mCursor.getColumnIndex("address");
@@ -78,6 +78,20 @@ public class MainActivity extends AppCompatActivity {
             mMainAdapter.notifyDataSetChanged();
         }
 
+        // 연락처 권한 얻어오는 부분
+        if (ContextCompat.checkSelfPermission(this,
+                Manifest.permission.READ_CONTACTS)
+                != PackageManager.PERMISSION_GRANTED) {
+
+            if (ActivityCompat.shouldShowRequestPermissionRationale(this,
+                    Manifest.permission.READ_CONTACTS)) {
+
+            } else {
+                ActivityCompat.requestPermissions(this,
+                        new String[]{Manifest.permission.READ_CONTACTS},
+                        2);
+            }
+        }
     }
 
     @Override
@@ -90,7 +104,7 @@ public class MainActivity extends AppCompatActivity {
                         if(grantResults[i] == PackageManager.PERMISSION_GRANTED) {
                             //문자 읽어오기
                             Uri uri = Uri.parse("content://sms");
-                            Cursor mCursor = getContentResolver().query(uri, null, null, null, null);
+                            Cursor mCursor = getContentResolver().query(uri, null, ") GROUP BY (address", null, null);
 
                             int bodyIndex = mCursor.getColumnIndex("body");
                             int addressIndex = mCursor.getColumnIndex("address");
