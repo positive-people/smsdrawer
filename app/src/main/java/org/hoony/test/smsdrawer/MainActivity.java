@@ -6,11 +6,17 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.view.Menu;
+import android.view.MenuItem;
+import android.view.View;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 
@@ -22,6 +28,7 @@ public class MainActivity extends AppCompatActivity {
     private RecyclerView mSideRecyclerView;
     private RecyclerView.Adapter mSideAdapter;
     private RecyclerView.LayoutManager mSideLayoutManager;
+    private DrawerLayout mDrawerLayout;
     private String[] data1 = {"전체","스팸","제주대","결제","컴공","가족","추가"};
 
     @Override
@@ -29,7 +36,22 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         mMainRecyclerView = findViewById(R.id.main_recycler);
+        mDrawerLayout = findViewById(R.id.drawer_layout);
         mMainRecyclerView.setHasFixedSize(true);
+
+        //액션바 홈버튼 이벤트마다 아이콘 변경
+        mDrawerLayout.addDrawerListener(new DrawerLayout.DrawerListener() {
+            public void onDrawerClosed(View drawerView) {
+                getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_action_name);
+            }
+            public void onDrawerOpened(View drawerView) {
+                getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_action_left_arrow);
+            }
+            public void onDrawerSlide(View drawerView, float slideOffset) {
+            }
+            public void onDrawerStateChanged(int newState) {
+        }});
+
 
         mMainLayoutManager = new LinearLayoutManager(this);
         mMainRecyclerView.setLayoutManager(mMainLayoutManager);
@@ -67,7 +89,7 @@ public class MainActivity extends AppCompatActivity {
                 Manifest.permission.READ_SMS)
                 == PackageManager.PERMISSION_GRANTED) {
             Uri uri = Uri.parse("content://sms");
-            Cursor mCursor = getContentResolver().query(uri, null, ") GROUP BY (address", null, null);
+            Cursor mCursor = getContentResolver().query(uri, null, "1=1) GROUP BY (address", null, null);
 
             int bodyIndex = mCursor.getColumnIndex("body");
             int addressIndex = mCursor.getColumnIndex("address");
@@ -92,6 +114,13 @@ public class MainActivity extends AppCompatActivity {
                         2);
             }
         }
+
+        // 액션바 이름 변경
+        getSupportActionBar().setTitle("메시지");
+        // 액션바 홈 버튼 추가
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_action_name);
+        getSupportActionBar().setHomeButtonEnabled(true);
     }
 
     @Override
@@ -119,4 +148,32 @@ public class MainActivity extends AppCompatActivity {
                 break;
         }
     }
+    // 액션바 표시
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu){
+        getMenuInflater().inflate(R.menu.menu, menu);
+        return true;
+    }
+    //액션바 액션 이벤트 처리
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item){
+        int id = item.getItemId();
+        if (id == android.R.id.home) {
+            if (mDrawerLayout.isDrawerOpen(mSideRecyclerView)) {
+                mDrawerLayout.closeDrawer(mSideRecyclerView);
+            } else {
+                mDrawerLayout.openDrawer(mSideRecyclerView);
+            }
+            Toast.makeText(this, "홈아이콘클릭", Toast.LENGTH_SHORT).show();
+            return true;
+        }
+        if (id == R.id.action_setting) {
+
+            return true;
+        }
+
+        return super.onOptionsItemSelected(item);
+    }
+
+
 }
