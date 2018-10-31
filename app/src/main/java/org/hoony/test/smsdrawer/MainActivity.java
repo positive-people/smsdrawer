@@ -34,6 +34,9 @@ public class MainActivity extends AppCompatActivity {
         mMainLayoutManager = new LinearLayoutManager(this);
         mMainRecyclerView.setLayoutManager(mMainLayoutManager);
 
+//        dataset.add(new MsgModel("곽효림", "바보", "오후 5:40", null));
+//        dataset.add(new MsgModel("원동훈", "바보", "오후 3:42", null));
+//        dataset.add(new MsgModel("현지훈", "바보", "오전 8:02", null));
         mMainAdapter = new MyAdapter(dataset);
         mMainRecyclerView.setAdapter(mMainAdapter);
 
@@ -64,7 +67,7 @@ public class MainActivity extends AppCompatActivity {
                 Manifest.permission.READ_SMS)
                 == PackageManager.PERMISSION_GRANTED) {
             Uri uri = Uri.parse("content://sms");
-            Cursor mCursor = getContentResolver().query(uri, null, null, null, null);
+            Cursor mCursor = getContentResolver().query(uri, null, ") GROUP BY (address", null, null);
 
             int bodyIndex = mCursor.getColumnIndex("body");
             int addressIndex = mCursor.getColumnIndex("address");
@@ -105,7 +108,7 @@ public class MainActivity extends AppCompatActivity {
                         if(grantResults[i] == PackageManager.PERMISSION_GRANTED) {
                             //문자 읽어오기
                             Uri uri = Uri.parse("content://sms");
-                            Cursor mCursor = getContentResolver().query(uri, null, null, null, null);
+                            Cursor mCursor = getContentResolver().query(uri, null, ") GROUP BY (address", null, null);
 
                             int bodyIndex = mCursor.getColumnIndex("body");
                             int addressIndex = mCursor.getColumnIndex("address");
