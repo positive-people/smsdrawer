@@ -34,9 +34,6 @@ public class MainActivity extends AppCompatActivity {
         mMainLayoutManager = new LinearLayoutManager(this);
         mMainRecyclerView.setLayoutManager(mMainLayoutManager);
 
-//        dataset.add(new MsgModel("곽효림", "바보", "오후 5:40", null));
-//        dataset.add(new MsgModel("원동훈", "바보", "오후 3:42", null));
-//        dataset.add(new MsgModel("현지훈", "바보", "오전 8:02", null));
         mMainAdapter = new MyAdapter(dataset);
         mMainRecyclerView.setAdapter(mMainAdapter);
 
@@ -76,6 +73,24 @@ public class MainActivity extends AppCompatActivity {
                 dataset.add(new MsgModel(mCursor.getString(addressIndex), mCursor.getString(bodyIndex), mCursor.getString(dateIndex), null));
             }
             mMainAdapter.notifyDataSetChanged();
+        }
+
+        if (ContextCompat.checkSelfPermission(this,
+                Manifest.permission.READ_CONTACTS)
+                != PackageManager.PERMISSION_GRANTED) {
+
+            if (ActivityCompat.shouldShowRequestPermissionRationale(this,
+                    Manifest.permission.READ_CONTACTS)) {
+
+            } else {
+                ActivityCompat.requestPermissions(this,
+                        new String[]{Manifest.permission.READ_CONTACTS},
+                        2);
+            }
+        } else if (ContextCompat.checkSelfPermission(this,
+                Manifest.permission.READ_CONTACTS)
+                == PackageManager.PERMISSION_GRANTED) {
+            //연락처 권한 받고 할 일
         }
 
     }
