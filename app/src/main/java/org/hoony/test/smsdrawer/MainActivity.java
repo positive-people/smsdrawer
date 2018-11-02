@@ -1,17 +1,22 @@
 package org.hoony.test.smsdrawer;
 
 import android.Manifest;
+import android.content.Context;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.net.Uri;
+import android.provider.ContactsContract;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.app.LoaderManager;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.content.CursorLoader;
+import android.support.v4.content.Loader;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-
+import android.util.Log;
 import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity {
@@ -34,9 +39,6 @@ public class MainActivity extends AppCompatActivity {
         mMainLayoutManager = new LinearLayoutManager(this);
         mMainRecyclerView.setLayoutManager(mMainLayoutManager);
 
-//        dataset.add(new MsgModel("곽효림", "바보", "오후 5:40", null));
-//        dataset.add(new MsgModel("원동훈", "바보", "오후 3:42", null));
-//        dataset.add(new MsgModel("현지훈", "바보", "오전 8:02", null));
         mMainAdapter = new MyAdapter(dataset);
         mMainRecyclerView.setAdapter(mMainAdapter);
 
@@ -67,13 +69,13 @@ public class MainActivity extends AppCompatActivity {
                 Manifest.permission.READ_SMS)
                 == PackageManager.PERMISSION_GRANTED) {
             Uri uri = Uri.parse("content://sms");
-            Cursor mCursor = getContentResolver().query(uri, null, ") GROUP BY (address", null, null);
+            Cursor mCursor = getContentResolver().query(uri, null, "1=1) GROUP BY (address", null, null);
 
             int bodyIndex = mCursor.getColumnIndex("body");
             int addressIndex = mCursor.getColumnIndex("address");
             int dateIndex = mCursor.getColumnIndex("date");
             for(mCursor.moveToFirst();!mCursor.isAfterLast();mCursor.moveToNext()) {
-                dataset.add(new MsgModel(mCursor.getString(addressIndex), mCursor.getString(bodyIndex), mCursor.getString(dateIndex), null));
+                dataset.add(new MsgModel(getContactName(mCursor.getString(addressIndex), this), mCursor.getString(bodyIndex), mCursor.getString(dateIndex), mCursor.getString(addressIndex), null));
             }
             mMainAdapter.notifyDataSetChanged();
         }
@@ -94,6 +96,8 @@ public class MainActivity extends AppCompatActivity {
                 Manifest.permission.READ_CONTACTS)
                 == PackageManager.PERMISSION_GRANTED) {
             //연락처 권한 받고 할 일
+
+
         }
 
     }
@@ -108,13 +112,13 @@ public class MainActivity extends AppCompatActivity {
                         if(grantResults[i] == PackageManager.PERMISSION_GRANTED) {
                             //문자 읽어오기
                             Uri uri = Uri.parse("content://sms");
-                            Cursor mCursor = getContentResolver().query(uri, null, ") GROUP BY (address", null, null);
+                            Cursor mCursor = getContentResolver().query(uri, null, "1=1) GROUP BY (address", null, null);
 
                             int bodyIndex = mCursor.getColumnIndex("body");
                             int addressIndex = mCursor.getColumnIndex("address");
                             int dateIndex = mCursor.getColumnIndex("date");
                             for(mCursor.moveToFirst();!mCursor.isAfterLast();mCursor.moveToNext()) {
-                                dataset.add(new MsgModel(mCursor.getString(addressIndex), mCursor.getString(bodyIndex), mCursor.getString(dateIndex), null));
+                                dataset.add(new MsgModel(getContactName(mCursor.getString(addressIndex), this), mCursor.getString(bodyIndex), mCursor.getString(dateIndex), mCursor.getString(addressIndex),null));
                             }
                             mMainAdapter.notifyDataSetChanged();
                         }
@@ -123,4 +127,29 @@ public class MainActivity extends AppCompatActivity {
                 break;
         }
     }
+
+    public String getContactName(final String phoneNumber, Context context)
+
+    {
+        if(phoneNumber == null || phoneNumber == "" || phoneNumber.isEmpty() ) {
+            return "";
+        }
+        Uri uri=Uri.withAppendedPath(ContactsContract.PhoneLookup.CONTENT_FILTER_URI,Uri.encode(phoneNumber));
+
+        String[] projection = new String[]{ContactsContract.PhoneLookup.DISPLAY_NAME};
+
+        String contactName="";
+
+        Cursor cursor=context.getContentResolver().query(uri,projection,null,null,null);
+
+        if (cursor != null) {
+            if(cursor.moveToFirst()) {
+                contactName=cursor.getString(0);
+            }
+            cursor.close();
+        }
+
+        return contactName;
+    }
+
 }

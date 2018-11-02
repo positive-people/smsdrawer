@@ -51,9 +51,22 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.MyViewHolder> {
     }
 
     public void onBindViewHolder(MyViewHolder holder, int position) {
-        holder.mTextName.setText(mDataset.get(position).getName());
+        if(mDataset.get(position).getName().isEmpty())
+            holder.mTextName.setText(mDataset.get(position).getPhonenumber());
+        else
+            holder.mTextName.setText(mDataset.get(position).getName());
         holder.mTextContent.setText(mDataset.get(position).getContent());
-        holder.mTextTime.setText(mDataset.get(position).getTime());
+
+
+        String sLatestDate;
+        try {
+            java.text.SimpleDateFormat formatter = new java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            sLatestDate = formatter.format(mDataset.get(position).getTime());
+        } catch (Exception ex) {
+            sLatestDate = "";
+        }
+
+        holder.mTextTime.setText(sLatestDate);
         if(mDataset.get(position).getProfile() != null)
             holder.mImageProfile.setImageDrawable(mDataset.get(position).getProfile());
         holder.mImageProfile.setBackground(new ShapeDrawable(new OvalShape()));

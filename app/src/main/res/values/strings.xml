@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">sms drawer</string>
+    <string name="profile_image">프로필 사진</string>
 </resources>
