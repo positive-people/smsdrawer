@@ -40,6 +40,7 @@ public class MainActivity extends AppCompatActivity {
         mMainRecyclerView.setLayoutManager(mMainLayoutManager);
 
         mMainAdapter = new MyAdapter(dataset);
+        ((MyAdapter) mMainAdapter).setMain(this);
         mMainRecyclerView.setAdapter(mMainAdapter);
 
 
@@ -75,7 +76,7 @@ public class MainActivity extends AppCompatActivity {
             int addressIndex = mCursor.getColumnIndex("address");
             int dateIndex = mCursor.getColumnIndex("date");
             for(mCursor.moveToFirst();!mCursor.isAfterLast();mCursor.moveToNext()) {
-                dataset.add(new MsgModel(getContactName(mCursor.getString(addressIndex), this), mCursor.getString(bodyIndex), mCursor.getString(dateIndex), mCursor.getString(addressIndex), null));
+                dataset.add(new MsgModel(null, mCursor.getString(bodyIndex), mCursor.getString(dateIndex), mCursor.getString(addressIndex), null));
             }
             mMainAdapter.notifyDataSetChanged();
         }
@@ -118,8 +119,17 @@ public class MainActivity extends AppCompatActivity {
                             int addressIndex = mCursor.getColumnIndex("address");
                             int dateIndex = mCursor.getColumnIndex("date");
                             for(mCursor.moveToFirst();!mCursor.isAfterLast();mCursor.moveToNext()) {
-                                dataset.add(new MsgModel(getContactName(mCursor.getString(addressIndex), this), mCursor.getString(bodyIndex), mCursor.getString(dateIndex), mCursor.getString(addressIndex),null));
+                                dataset.add(new MsgModel(null, mCursor.getString(bodyIndex), mCursor.getString(dateIndex), mCursor.getString(addressIndex),null));
                             }
+                            mMainAdapter.notifyDataSetChanged();
+                        }
+                    }
+                }
+                break;
+                case 2:
+                for(int i = 0; i < permissions.length; i++) {
+                    if(permissions[i].equals(Manifest.permission.READ_CONTACTS)) {
+                        if(grantResults[i] == PackageManager.PERMISSION_GRANTED) {
                             mMainAdapter.notifyDataSetChanged();
                         }
                     }
@@ -128,28 +138,6 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    public String getContactName(final String phoneNumber, Context context)
 
-    {
-        if(phoneNumber == null || phoneNumber == "" || phoneNumber.isEmpty() ) {
-            return "";
-        }
-        Uri uri=Uri.withAppendedPath(ContactsContract.PhoneLookup.CONTENT_FILTER_URI,Uri.encode(phoneNumber));
-
-        String[] projection = new String[]{ContactsContract.PhoneLookup.DISPLAY_NAME};
-
-        String contactName="";
-
-        Cursor cursor=context.getContentResolver().query(uri,projection,null,null,null);
-
-        if (cursor != null) {
-            if(cursor.moveToFirst()) {
-                contactName=cursor.getString(0);
-            }
-            cursor.close();
-        }
-
-        return contactName;
-    }
 
 }

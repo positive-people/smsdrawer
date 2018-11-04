@@ -35,9 +35,9 @@ public class MsgModel {
         return profile;
     }
 
-//    public void setName(String name) {
-//        this.name = name;
-//    }
+    public void setName(String name) {
+        this.name = name;
+    }
 //
 //    public void setContent(String content) {
 //        this.content = content;

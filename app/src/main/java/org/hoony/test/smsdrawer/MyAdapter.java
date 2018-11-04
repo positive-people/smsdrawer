@@ -1,11 +1,18 @@
 package org.hoony.test.smsdrawer;
 
 import android.Manifest;
+import android.app.Activity;
+import android.content.ContentResolver;
+import android.content.Context;
 import android.content.pm.PackageManager;
+import android.database.Cursor;
 import android.graphics.drawable.ShapeDrawable;
 import android.graphics.drawable.shapes.OvalShape;
+import android.net.Uri;
+import android.provider.ContactsContract;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,6 +23,7 @@ import java.util.ArrayList;
 
 public class MyAdapter extends RecyclerView.Adapter<MyAdapter.MyViewHolder> {
     private ArrayList<MsgModel> mDataset;
+    private Activity main;
 
     public static class MyViewHolder extends RecyclerView.ViewHolder {
         public TextView mTextName;
@@ -35,6 +43,10 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.MyViewHolder> {
         }
     }
 
+    public void setMain(Activity main) {
+        this.main = main;
+    }
+
     public MyAdapter(ArrayList<MsgModel> myDataset) {
         mDataset = myDataset;
     }
@@ -51,6 +63,10 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.MyViewHolder> {
     }
 
     public void onBindViewHolder(MyViewHolder holder, int position) {
+        if(mDataset.get(position).getName() == null) {
+            Log.i("aa", "dss");
+            mDataset.get(position).setName(getContactName(mDataset.get(position).getPhonenumber()));
+        }
         if(mDataset.get(position).getName().isEmpty())
             holder.mTextName.setText(mDataset.get(position).getPhonenumber());
         else
@@ -75,5 +91,35 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.MyViewHolder> {
 
     public int getItemCount() {
             return mDataset.size();
+    }
+
+    public String getContactName(final String phoneNumber)
+
+    {
+        if (ContextCompat.checkSelfPermission(main,
+                Manifest.permission.READ_CONTACTS)
+                != PackageManager.PERMISSION_GRANTED) {
+            return "";
+        }
+        if(phoneNumber == null || phoneNumber == "" || phoneNumber.isEmpty() ) {
+            return "";
+        }
+        Uri uri=Uri.withAppendedPath(ContactsContract.PhoneLookup.CONTENT_FILTER_URI,Uri.encode(phoneNumber));
+
+        String[] projection = new String[]{ContactsContract.PhoneLookup.DISPLAY_NAME};
+
+        String contactName="";
+
+
+        Cursor cursor=main.getContentResolver().query(uri,projection,null,null,null);
+
+        if (cursor != null) {
+            if(cursor.moveToFirst()) {
+                contactName=cursor.getString(0);
+            }
+            cursor.close();
+        }
+
+        return contactName;
     }
 }
