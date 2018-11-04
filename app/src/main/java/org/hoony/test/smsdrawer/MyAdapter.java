@@ -6,10 +6,15 @@ import android.content.ContentResolver;
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
+import android.graphics.Canvas;
+import android.graphics.ColorFilter;
+import android.graphics.drawable.Drawable;
 import android.graphics.drawable.ShapeDrawable;
 import android.graphics.drawable.shapes.OvalShape;
 import android.net.Uri;
 import android.provider.ContactsContract;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -91,6 +96,8 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.MyViewHolder> {
         holder.mTextTime.setText(sLatestDate);
         if(mDataset.get(position).getProfile() != null)
             holder.mImageProfile.setImageURI(mDataset.get(position).getProfile());
+        else
+            holder.mImageProfile.setImageResource(R.drawable.ic_launcher_background);
         holder.mImageProfile.setBackground(new ShapeDrawable(new OvalShape()));
         holder.mImageProfile.setClipToOutline(true);
     }
