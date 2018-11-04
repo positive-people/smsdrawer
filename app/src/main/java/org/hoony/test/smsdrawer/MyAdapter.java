@@ -64,10 +64,16 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.MyViewHolder> {
     }
 
     public void onBindViewHolder(MyViewHolder holder, int position) {
-        if(mDataset.get(position).getName() == null) {
-            mDataset.get(position).setName(getContactName(mDataset.get(position).getPhonenumber()));
+        Cursor cursor = getContactName(mDataset.get(position).getPhonenumber());
+        if(mDataset.get(position).getName() == null && cursor != null && cursor.getCount() > 0) {
+            cursor.moveToFirst();
+            mDataset.get(position).setName(cursor.getString(0));
+            if (cursor.getString(1) != null ) {
+                mDataset.get(position).setProfile(Uri.parse(cursor.getString(1)));
+            }
+            cursor.close();
         }
-        if(mDataset.get(position).getName().isEmpty())
+        if(mDataset.get(position).getName() == null || mDataset.get(position).getName().isEmpty())
             holder.mTextName.setText(mDataset.get(position).getPhonenumber());
         else
             holder.mTextName.setText(mDataset.get(position).getName());
@@ -84,7 +90,7 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.MyViewHolder> {
 
         holder.mTextTime.setText(sLatestDate);
         if(mDataset.get(position).getProfile() != null)
-            holder.mImageProfile.setImageDrawable(mDataset.get(position).getProfile());
+            holder.mImageProfile.setImageURI(mDataset.get(position).getProfile());
         holder.mImageProfile.setBackground(new ShapeDrawable(new OvalShape()));
         holder.mImageProfile.setClipToOutline(true);
     }
@@ -93,33 +99,24 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.MyViewHolder> {
             return mDataset.size();
     }
 
-    public String getContactName(final String phoneNumber)
+    public Cursor getContactName(final String phoneNumber)
 
     {
         if (ContextCompat.checkSelfPermission(main,
                 Manifest.permission.READ_CONTACTS)
                 != PackageManager.PERMISSION_GRANTED) {
-            return "";
+            return null;
         }
         if(phoneNumber == null || phoneNumber == "" || phoneNumber.isEmpty() ) {
-            return "";
+            return null;
         }
         Uri uri=Uri.withAppendedPath(ContactsContract.PhoneLookup.CONTENT_FILTER_URI,Uri.encode(phoneNumber));
 
-        String[] projection = new String[]{ContactsContract.PhoneLookup.DISPLAY_NAME};
-
-        String contactName="";
-
+        String[] projection = new String[]{ContactsContract.PhoneLookup.DISPLAY_NAME, ContactsContract.PhoneLookup.PHOTO_THUMBNAIL_URI};
 
         Cursor cursor=main.getContentResolver().query(uri,projection,null,null,null);
 
-        if (cursor != null) {
-            if(cursor.moveToFirst()) {
-                contactName=cursor.getString(0);
-            }
-            cursor.close();
-        }
 
-        return contactName;
+        return cursor;
     }
 }
