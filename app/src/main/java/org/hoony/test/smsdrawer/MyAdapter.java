@@ -19,6 +19,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import java.sql.Date;
 import java.util.ArrayList;
 
 public class MyAdapter extends RecyclerView.Adapter<MyAdapter.MyViewHolder> {
@@ -64,7 +65,6 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.MyViewHolder> {
 
     public void onBindViewHolder(MyViewHolder holder, int position) {
         if(mDataset.get(position).getName() == null) {
-            Log.i("aa", "dss");
             mDataset.get(position).setName(getContactName(mDataset.get(position).getPhonenumber()));
         }
         if(mDataset.get(position).getName().isEmpty())
@@ -77,7 +77,7 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.MyViewHolder> {
         String sLatestDate;
         try {
             java.text.SimpleDateFormat formatter = new java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-            sLatestDate = formatter.format(mDataset.get(position).getTime());
+            sLatestDate = formatter.format(new Date(Long.parseLong(mDataset.get(position).getTime())));
         } catch (Exception ex) {
             sLatestDate = "";
         }
