@@ -2,23 +2,20 @@ package org.hoony.test.smsdrawer;
 
 import android.Manifest;
 import android.app.Activity;
-import android.content.ContentResolver;
-import android.content.Context;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
-import android.graphics.Canvas;
-import android.graphics.ColorFilter;
+import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.ShapeDrawable;
 import android.graphics.drawable.shapes.OvalShape;
 import android.net.Uri;
 import android.provider.ContactsContract;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
@@ -26,50 +23,67 @@ import android.widget.TextView;
 
 import java.sql.Date;
 import java.util.ArrayList;
+import java.util.Locale;
 
-public class MyAdapter extends RecyclerView.Adapter<MyAdapter.MyViewHolder> {
+public class MsgAdapter extends RecyclerView.Adapter<MsgAdapter.MyViewHolder> {
     private ArrayList<MsgModel> mDataset;
     private Activity main;
+    private Drawable defaultImage;
 
-    public static class MyViewHolder extends RecyclerView.ViewHolder {
-        public TextView mTextName;
-        public TextView mTextContent;
-        public TextView mTextTime;
-        public ImageView mImageProfile;
-        public View mLine;
+    class MyViewHolder extends RecyclerView.ViewHolder implements View.OnTouchListener {
+        TextView mTextName;
+        TextView mTextContent;
+        TextView mTextTime;
+        TextView mTextNameFirst;
+        ImageView mImageProfile;
+        View mLine;
 
-        public MyViewHolder(View msgView) {
+        MyViewHolder(View msgView) {
             super(msgView);
             mTextName = msgView.findViewById(R.id.text_name);
             mTextContent = msgView.findViewById(R.id.text_content);
             mTextTime = msgView.findViewById(R.id.text_time);
             mImageProfile = msgView.findViewById(R.id.image_profile);
             mLine = msgView.findViewById(R.id.line);
+            mTextNameFirst = msgView.findViewById(R.id.text_name_first);
+            msgView.setOnTouchListener(this);
+        }
 
+        @Override
+        public boolean onTouch(View view, MotionEvent motionEvent) {
+            if (motionEvent.getAction() == MotionEvent.ACTION_DOWN) {
+                view.setBackgroundColor(Color.LTGRAY);
+                return true;
+            } else if (motionEvent.getAction() == MotionEvent.ACTION_OUTSIDE || motionEvent.getAction() == MotionEvent.ACTION_CANCEL) {
+                view.setBackgroundColor(Color.rgb(250,250,250));
+                return false;
+            } else if (motionEvent.getAction() == MotionEvent.ACTION_UP) {
+                view.setBackgroundColor(Color.rgb(250,250,250));
+
+                return false;
+            }
+            return false;
         }
     }
 
-    public void setMain(Activity main) {
+    void setMain(Activity main) {
         this.main = main;
+        defaultImage = main.getResources().getDrawable(R.drawable.ic_launcher_background);
     }
 
-    public MyAdapter(ArrayList<MsgModel> myDataset) {
-        mDataset = myDataset;
+    MsgAdapter(ArrayList<MsgModel> myDataSet) {
+        mDataset = myDataSet;
     }
 
-    public void setDataset(ArrayList<MsgModel> myDataset) {
-        mDataset = myDataset;
-    }
-
-    public MyAdapter.MyViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+    @NonNull
+    public MsgAdapter.MyViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.msg_item, parent, false);
 
-        MyViewHolder vh = new MyViewHolder(v);
-        return vh;
+        return new MyViewHolder(v);
     }
 
-    public void onBindViewHolder(MyViewHolder holder, int position) {
-        Cursor cursor = getContactName(mDataset.get(position).getPhonenumber());
+    public void onBindViewHolder(@NonNull MyViewHolder holder, int position) {
+        Cursor cursor = getContactName(mDataset.get(position).getPhoneNumber());
         if(mDataset.get(position).getName() == null && cursor != null && cursor.getCount() > 0) {
             cursor.moveToFirst();
             mDataset.get(position).setName(cursor.getString(0));
@@ -79,7 +93,7 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.MyViewHolder> {
             cursor.close();
         }
         if(mDataset.get(position).getName() == null || mDataset.get(position).getName().isEmpty())
-            holder.mTextName.setText(mDataset.get(position).getPhonenumber());
+            holder.mTextName.setText(mDataset.get(position).getPhoneNumber());
         else
             holder.mTextName.setText(mDataset.get(position).getName());
         holder.mTextContent.setText(mDataset.get(position).getContent());
@@ -87,17 +101,28 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.MyViewHolder> {
 
         String sLatestDate;
         try {
-            java.text.SimpleDateFormat formatter = new java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            java.text.SimpleDateFormat formatter = new java.text.SimpleDateFormat("yyyy-MM-dd", Locale.KOREA);
             sLatestDate = formatter.format(new Date(Long.parseLong(mDataset.get(position).getTime())));
         } catch (Exception ex) {
             sLatestDate = "";
         }
 
         holder.mTextTime.setText(sLatestDate);
-        if(mDataset.get(position).getProfile() != null)
+        if(mDataset.get(position).getProfile() != null) {
             holder.mImageProfile.setImageURI(mDataset.get(position).getProfile());
-        else
-            holder.mImageProfile.setImageResource(R.drawable.ic_launcher_background);
+            holder.mTextNameFirst.setText("");
+        } else {
+            if(defaultImage != null) {
+                holder.mImageProfile.setImageDrawable(defaultImage);
+
+            } else {
+                holder.mImageProfile.setImageResource(R.drawable.ic_launcher_background);
+
+            }
+            if(!holder.mTextName.getText().toString().isEmpty())
+                holder.mTextNameFirst.setText(holder.mTextName.getText().subSequence(0,1).toString());
+            //holder.mTextNameFirst.setText(mDataSet.get(position).getName().charAt(0));
+        }
         holder.mImageProfile.setBackground(new ShapeDrawable(new OvalShape()));
         holder.mImageProfile.setClipToOutline(true);
     }
@@ -106,7 +131,7 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.MyViewHolder> {
             return mDataset.size();
     }
 
-    public Cursor getContactName(final String phoneNumber)
+    private Cursor getContactName(final String phoneNumber)
 
     {
         if (ContextCompat.checkSelfPermission(main,
@@ -114,16 +139,13 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.MyViewHolder> {
                 != PackageManager.PERMISSION_GRANTED) {
             return null;
         }
-        if(phoneNumber == null || phoneNumber == "" || phoneNumber.isEmpty() ) {
+        if(phoneNumber == null || phoneNumber.isEmpty() ) {
             return null;
         }
         Uri uri=Uri.withAppendedPath(ContactsContract.PhoneLookup.CONTENT_FILTER_URI,Uri.encode(phoneNumber));
 
         String[] projection = new String[]{ContactsContract.PhoneLookup.DISPLAY_NAME, ContactsContract.PhoneLookup.PHOTO_THUMBNAIL_URI};
 
-        Cursor cursor=main.getContentResolver().query(uri,projection,null,null,null);
-
-
-        return cursor;
+        return main.getContentResolver().query(uri,projection,null,null,null);
     }
 }
