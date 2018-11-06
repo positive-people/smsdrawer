@@ -59,7 +59,8 @@ public class MsgAdapter extends RecyclerView.Adapter<MsgAdapter.MyViewHolder> {
                 return false;
             } else if (motionEvent.getAction() == MotionEvent.ACTION_UP) {
                 view.setBackgroundColor(Color.rgb(250,250,250));
-
+                Intent intent = new Intent(main, MessagesList.class);
+                main.startActivity(intent);
                 return false;
             }
             return false;

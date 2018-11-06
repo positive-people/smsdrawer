@@ -51,20 +51,19 @@ public class MainActivity extends AppCompatActivity {
         drawers.get(0).setSpec(DrawerModel.ALL_DRAWER_TYPE);
         drawers.get(drawers.size()-1).setSpec(DrawerModel.ADD_DRAWER_TYPE);
 
-        RecyclerView mMainRecyclerView = findViewById(R.id.main_recycler);
         mMainRecyclerView = findViewById(R.id.main_recycler);
         mDrawerLayout = findViewById(R.id.drawer_layout);
         mMainRecyclerView.setHasFixedSize(true);
 
         //액션바 홈버튼 이벤트마다 아이콘 변경
         mDrawerLayout.addDrawerListener(new DrawerLayout.DrawerListener() {
-            public void onDrawerClosed(View drawerView) {
+            public void onDrawerClosed(@NonNull View drawerView) {
                 getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_action_name);
             }
             public void onDrawerOpened(View drawerView) {
                 getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_action_left_arrow);
             }
-            public void onDrawerSlide(View drawerView, float slideOffset) {
+            public void onDrawerSlide(@NonNull View drawerView, float slideOffset) {
             }
             public void onDrawerStateChanged(int newState) {
         }});
@@ -123,8 +122,6 @@ public class MainActivity extends AppCompatActivity {
 
         }
 
-        // 액션바 이름 변경
-        getSupportActionBar().setTitle("메시지");
         // 액션바 홈 버튼 추가
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_action_name);
@@ -185,6 +182,10 @@ public class MainActivity extends AppCompatActivity {
         mMainAdapter.notifyDataSetChanged();
     }
 
+    public ArrayList<DrawerModel> getDrawers() {
+        return drawers;
+    }
+
     //액션바 액션 이벤트 처리
     @Override
     public boolean onOptionsItemSelected(MenuItem item){
@@ -195,7 +196,6 @@ public class MainActivity extends AppCompatActivity {
             } else {
                 mDrawerLayout.openDrawer(mSideRecyclerView);
             }
-            Toast.makeText(this, "홈아이콘클릭", Toast.LENGTH_SHORT).show();
             return true;
         }
 
