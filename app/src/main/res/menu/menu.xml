@@ -6,9 +6,11 @@
     tools:context=".MainActivity">
 
     <item
-        android:id="@+id/action_search"
-        android:title="Search"
+        android:id="@+id/action_delete"
+        android:icon="@drawable/ic_action_delete"
+        android:title="Delete"
         app:showAsAction="always" />
+
     <item android:id="@+id/action_setting"
         android:title="설정"
         app:showAsAction="ifRoom"/>

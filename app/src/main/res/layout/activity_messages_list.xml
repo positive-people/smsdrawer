@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/white"
+    tools:context=".MessagesList">
+
+    <com.stfalcon.chatkit.messages.MessagesList
+        android:id="@+id/messagesList"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_above="@+id/input"
+        app:dateHeaderFormat="dd MMMM yyyy"
+        app:incomingDefaultBubbleColor="@color/dialog_unread_text"
+        app:incomingDefaultBubblePressedColor="@color/dialog_date_text"
+        app:incomingDefaultBubbleSelectedColor="@color/gray"
+        app:incomingDefaultImageOverlayPressedColor="@color/dialog_title_text"
+        app:incomingDefaultImageOverlaySelectedColor="@color/white60"
+        app:incomingTextColor="#00FF00"
+        app:incomingTextLinkColor="@color/dark_mint"
+        app:incomingTextSize="18sp"
+        app:outcomingDefaultBubbleColor="@color/dialog_unread_text"
+        app:outcomingDefaultBubblePressedColor="@color/colorPrimary"
+        app:outcomingDefaultBubbleSelectedColor="@color/cornflower_blue_two_24"
+        app:outcomingDefaultImageOverlayPressedColor="@color/dialog_title_text"
+        app:outcomingDefaultImageOverlaySelectedColor="@color/transparent"
+        app:outcomingTextColor="@color/white"
+        app:outcomingTextLinkColor="@color/blue"
+        app:outcomingTextSize="18sp"
+        app:textAutoLink="all" />
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_above="@+id/input"
+        android:layout_marginLeft="16dp"
+        android:layout_marginRight="16dp"
+        android:background="@color/dark_mint"/>
+
+    <com.stfalcon.chatkit.messages.MessageInput
+        android:id="@+id/input"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        app:attachmentButtonDefaultIconColor="@color/colorPrimary"
+        app:attachmentButtonDefaultIconPressedColor="@color/colorAccent"
+        app:inputButtonDefaultBgColor="@color/colorPrimary"
+        app:inputButtonDefaultBgPressedColor="@color/colorPrimaryDark"
+        app:inputCursorDrawable="@drawable/ic_action_send"
+        app:inputHint="메세지를 입력하세요"
+        app:showAttachmentButton="false"/>
+
+
+</RelativeLayout>
