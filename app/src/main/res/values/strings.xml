@@ -1,4 +1,5 @@
 <resources>
     <string name="app_name">sms drawer</string>
-    <string name="profile_image">프로필 사진</string>
+    <string name="drawer_open">Open</string>
+    <string name="drawer_close">Close</string>
 </resources>
