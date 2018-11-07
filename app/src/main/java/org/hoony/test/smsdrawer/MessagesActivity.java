@@ -79,9 +79,18 @@ public class MessagesActivity extends AppCompatActivity {
         int bodyIndex = mCursor.getColumnIndex("body");
         int addressIndex = mCursor.getColumnIndex("address");
         int dateIndex = mCursor.getColumnIndex("date");
+
         ArrayList<Message> list = new ArrayList<>();
         for(mCursor.moveToFirst();!mCursor.isAfterLast();mCursor.moveToNext()) {
-            list.add(new Message(mCursor.getString(addressIndex), mCursor.getString(bodyIndex), mCursor.getString(addressIndex) == your.getId() ? your : me, new Date(Long.parseLong(mCursor.getString(dateIndex)))));
+            if (mCursor.isFirst()) {
+                for(int i = 0; i < mCursor.getColumnCount(); i++) {
+                    if (mCursor.getString(i) == null) continue;
+                    Log.d("sms", mCursor.getColumnName(i));
+                    Log.d("sms", mCursor.getString(i));
+                }
+            }
+            Message message = new Message(mCursor.getString(addressIndex), mCursor.getString(bodyIndex), mCursor.getString(mCursor.getColumnIndex("type")).equals("1") ? your : me, new Date(Long.parseLong(mCursor.getString(dateIndex))));
+            list.add(message);
         }
         mCursor.close();
         Log.i("msg", new Integer(list.size()).toString());
