@@ -23,6 +23,7 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 
+import android.view.KeyEvent;
 import android.view.MenuItem;
 import android.view.View;
 
@@ -55,7 +56,7 @@ public class MainActivity extends AppCompatActivity {
         drawers.add(new DrawerModel("서랍 추가"));
 
         drawers.get(0).setSpec(DrawerModel.ALL_DRAWER_TYPE);
-        drawers.get(drawers.size()-1).setSpec(DrawerModel.ADD_DRAWER_TYPE);
+        drawers.get(drawers.size() - 1).setSpec(DrawerModel.ADD_DRAWER_TYPE);
 
         mMainRecyclerView = findViewById(R.id.main_recycler);
         mDrawerLayout = findViewById(R.id.drawer_layout);
@@ -66,13 +67,17 @@ public class MainActivity extends AppCompatActivity {
             public void onDrawerClosed(@NonNull View drawerView) {
                 getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_action_name);
             }
+
             public void onDrawerOpened(View drawerView) {
                 getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_action_left_arrow);
             }
+
             public void onDrawerSlide(@NonNull View drawerView, float slideOffset) {
             }
+
             public void onDrawerStateChanged(int newState) {
-        }});
+            }
+        });
 
 
         mMainLayoutManager = new LinearLayoutManager(this);
@@ -100,10 +105,10 @@ public class MainActivity extends AppCompatActivity {
 
             if (!ActivityCompat.shouldShowRequestPermissionRationale(this,
                     Manifest.permission.READ_SMS)) {
-                        ActivityCompat.requestPermissions(this,
-                                new String[]{Manifest.permission.READ_SMS},
-                                1);
-                    }
+                ActivityCompat.requestPermissions(this,
+                        new String[]{Manifest.permission.READ_SMS},
+                        1);
+            }
         } else if (ContextCompat.checkSelfPermission(this,
                 Manifest.permission.READ_SMS)
                 == PackageManager.PERMISSION_GRANTED) {
@@ -116,10 +121,10 @@ public class MainActivity extends AppCompatActivity {
 
             if (!ActivityCompat.shouldShowRequestPermissionRationale(this,
                     Manifest.permission.READ_CONTACTS)) {
-                        ActivityCompat.requestPermissions(this,
-                                new String[]{Manifest.permission.READ_CONTACTS},
-                                2);
-                    }
+                ActivityCompat.requestPermissions(this,
+                        new String[]{Manifest.permission.READ_CONTACTS},
+                        2);
+            }
         } else if (ContextCompat.checkSelfPermission(this,
                 Manifest.permission.READ_CONTACTS)
                 == PackageManager.PERMISSION_GRANTED) {
@@ -137,21 +142,21 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        switch(requestCode) {
+        switch (requestCode) {
             case 1:
-                for(int i = 0; i < permissions.length; i++) {
-                    if(permissions[i].equals(Manifest.permission.READ_SMS)) {
-                        if(grantResults[i] == PackageManager.PERMISSION_GRANTED) {
+                for (int i = 0; i < permissions.length; i++) {
+                    if (permissions[i].equals(Manifest.permission.READ_SMS)) {
+                        if (grantResults[i] == PackageManager.PERMISSION_GRANTED) {
                             //문자 읽어오기
                             readSMS();
                         }
                     }
                 }
                 break;
-                case 2:
-                for(int i = 0; i < permissions.length; i++) {
-                    if(permissions[i].equals(Manifest.permission.READ_CONTACTS)) {
-                        if(grantResults[i] == PackageManager.PERMISSION_GRANTED) {
+            case 2:
+                for (int i = 0; i < permissions.length; i++) {
+                    if (permissions[i].equals(Manifest.permission.READ_CONTACTS)) {
+                        if (grantResults[i] == PackageManager.PERMISSION_GRANTED) {
                             mMainAdapter.notifyDataSetChanged();
                         }
                     }
@@ -165,11 +170,11 @@ public class MainActivity extends AppCompatActivity {
         super.onActivityResult(requestCode, resultCode, data);
         if (resultCode == RESULT_OK && requestCode == 0) {
             DrawerModel model = data.getParcelableExtra(EXTRA_DRAWER_MODEL);
-            drawers.add(drawers.size()-1, model);
+            drawers.add(drawers.size() - 1, model);
             Log.i("Model", model.getName());
             Log.i("Model", model.getKeywords().toString());
             Log.i("Model", model.getNumbers().toString());
-            mSideAdapter.notifyItemInserted(drawers.size()-2);
+            mSideAdapter.notifyItemInserted(drawers.size() - 2);
         }
     }
 
@@ -177,12 +182,12 @@ public class MainActivity extends AppCompatActivity {
         Uri uri = Uri.parse("content://sms");
         Cursor mCursor = getContentResolver().query(uri, null, "1=1) GROUP BY (address", null, null);
 
-        if(mCursor == null) return;
+        if (mCursor == null) return;
         int bodyIndex = mCursor.getColumnIndex("body");
         int addressIndex = mCursor.getColumnIndex("address");
         int dateIndex = mCursor.getColumnIndex("date");
-        for(mCursor.moveToFirst();!mCursor.isAfterLast();mCursor.moveToNext()) {
-            dataSet.add(new MsgModel(null, mCursor.getString(bodyIndex), mCursor.getString(dateIndex), mCursor.getString(addressIndex),null));
+        for (mCursor.moveToFirst(); !mCursor.isAfterLast(); mCursor.moveToNext()) {
+            dataSet.add(new MsgModel(null, mCursor.getString(bodyIndex), mCursor.getString(dateIndex), mCursor.getString(addressIndex), null));
         }
         mCursor.close();
         mMainAdapter.notifyDataSetChanged();
@@ -194,7 +199,7 @@ public class MainActivity extends AppCompatActivity {
 
     //액션바 액션 이벤트 처리
     @Override
-    public boolean onOptionsItemSelected(MenuItem item){
+    public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
         if (id == android.R.id.home) {
             if (mDrawerLayout.isDrawerOpen(mSideRecyclerView)) {
@@ -204,9 +209,27 @@ public class MainActivity extends AppCompatActivity {
             }
             return true;
         }
-
-
         return super.onOptionsItemSelected(item);
     }
+
+    //취소버튼 조작
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        if (mDrawerLayout.isDrawerOpen(mSideRecyclerView)) {
+            if (event.getAction() == KeyEvent.ACTION_DOWN) {
+                if (keyCode == KeyEvent.KEYCODE_BACK) {
+                    mDrawerLayout.closeDrawer(mSideRecyclerView);
+                }
+            }
+        } else {
+            if (event.getAction() == KeyEvent.ACTION_DOWN) {
+                if (keyCode == KeyEvent.KEYCODE_BACK) {
+                    return super.onKeyDown(keyCode, event);
+                }
+            }
+        }
+        return true;
+    }
+
 
 }
