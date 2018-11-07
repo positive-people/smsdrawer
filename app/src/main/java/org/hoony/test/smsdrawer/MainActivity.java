@@ -15,6 +15,7 @@ import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 
+import android.view.KeyEvent;
 import android.view.MenuItem;
 import android.view.View;
 
@@ -182,7 +183,7 @@ public class MainActivity extends AppCompatActivity {
         criteria += "1=0) GROUP BY (address";
         Cursor mCursor = getContentResolver().query(uri, null, criteria, null, null);
 
-        if(mCursor == null) return;
+        if (mCursor == null) return;
         int bodyIndex = mCursor.getColumnIndex("body");
         int addressIndex = mCursor.getColumnIndex("address");
         int dateIndex = mCursor.getColumnIndex("date");
@@ -200,7 +201,7 @@ public class MainActivity extends AppCompatActivity {
 
     //액션바 액션 이벤트 처리
     @Override
-    public boolean onOptionsItemSelected(MenuItem item){
+    public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
         if (id == android.R.id.home) {
             if (mDrawerLayout.isDrawerOpen(mSideRecyclerView)) {
@@ -210,9 +211,26 @@ public class MainActivity extends AppCompatActivity {
             }
             return true;
         }
-
-
         return super.onOptionsItemSelected(item);
+    }
+
+    //취소버튼 조작
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        if (mDrawerLayout.isDrawerOpen(mSideRecyclerView)) {
+            if (event.getAction() == KeyEvent.ACTION_DOWN) {
+                if (keyCode == KeyEvent.KEYCODE_BACK) {
+                    mDrawerLayout.closeDrawer(mSideRecyclerView);
+                }
+            }
+        } else {
+            if (event.getAction() == KeyEvent.ACTION_DOWN) {
+                if (keyCode == KeyEvent.KEYCODE_BACK) {
+                    return super.onKeyDown(keyCode, event);
+                }
+            }
+        }
+        return true;
     }
 
     public void closeSideDrawer() {
@@ -222,6 +240,7 @@ public class MainActivity extends AppCompatActivity {
     public void notifyChanged(int pos) {
         mSideAdapter.notifyItemChanged(pos);
     }
+
 
     public int getSelectedDrawerPosition() {
         return selectedDrawerPosition;
