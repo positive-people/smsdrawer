@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.ShapeDrawable;
 import android.graphics.drawable.shapes.OvalShape;
@@ -119,6 +120,7 @@ public class MsgAdapter extends RecyclerView.Adapter<MsgAdapter.MyViewHolder> {
         }
 
         holder.mTextTime.setText(sLatestDate);
+        holder.mImageProfile.setVisibility(View.VISIBLE);
         if(mDataset.get(position).getProfile() != null) {
             holder.mImageProfile.setImageURI(mDataset.get(position).getProfile());
             holder.mTextNameFirst.setText("");
@@ -130,8 +132,11 @@ public class MsgAdapter extends RecyclerView.Adapter<MsgAdapter.MyViewHolder> {
                 holder.mImageProfile.setImageResource(R.drawable.ic_launcher_background);
 
             }
-            if(!holder.mTextName.getText().toString().isEmpty())
-                holder.mTextNameFirst.setText(holder.mTextName.getText().subSequence(0,1).toString());
+            if(mDataset.get(position).getName() != null && !mDataset.get(position).getName().isEmpty()) {
+                holder.mTextNameFirst.setText(mDataset.get(position).getName().subSequence(0, 1).toString());
+                holder.mImageProfile.setImageDrawable(new ColorDrawable(0xFFFFEEBB));
+            } else
+                holder.mTextNameFirst.setText("");
             //holder.mTextNameFirst.setText(mDataSet.get(position).getName().charAt(0));
         }
         holder.mImageProfile.setBackground(new ShapeDrawable(new OvalShape()));
