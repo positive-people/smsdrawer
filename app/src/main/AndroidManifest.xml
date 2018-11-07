@@ -19,7 +19,7 @@
             </intent-filter>
         </activity>
         <activity android:name=".AddDrawerActivity"></activity>
-        <activity android:name=".MessagesList"></activity>
+        <activity android:name=".MessagesActivity"></activity>
     </application>
 
 </manifest>

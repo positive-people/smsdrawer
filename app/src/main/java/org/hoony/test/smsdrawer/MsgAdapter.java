@@ -25,6 +25,8 @@ import java.sql.Date;
 import java.util.ArrayList;
 import java.util.Locale;
 
+import static org.hoony.test.smsdrawer.MainActivity.EXTRA_MSG_MODEL;
+
 public class MsgAdapter extends RecyclerView.Adapter<MsgAdapter.MyViewHolder> {
     private ArrayList<MsgModel> mDataset;
     private Activity main;
@@ -59,7 +61,8 @@ public class MsgAdapter extends RecyclerView.Adapter<MsgAdapter.MyViewHolder> {
                 return false;
             } else if (motionEvent.getAction() == MotionEvent.ACTION_UP) {
                 view.setBackgroundColor(Color.rgb(250,250,250));
-                Intent intent = new Intent(main, MessagesList.class);
+                Intent intent = new Intent(main, MessagesActivity.class);
+                intent.putExtra(EXTRA_MSG_MODEL, mDataset.get(getAdapterPosition()));
                 main.startActivity(intent);
                 return false;
             }

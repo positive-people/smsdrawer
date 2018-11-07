@@ -38,6 +38,8 @@ public class MainActivity extends AppCompatActivity {
     private ArrayList<DrawerModel> drawers = new ArrayList<>();
     private DrawerLayout mDrawerLayout;
 
+    public final static String EXTRA_MSG_MODEL = "org.hoony.test.smsdrawer.MSG_MODEL";
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
