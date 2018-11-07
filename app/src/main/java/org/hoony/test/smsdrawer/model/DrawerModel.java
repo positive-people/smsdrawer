@@ -1,4 +1,4 @@
-package org.hoony.test.smsdrawer;
+package org.hoony.test.smsdrawer.model;
 
 import android.os.Parcel;
 import android.os.Parcelable;
@@ -12,12 +12,12 @@ public class DrawerModel implements Parcelable {
     private int count = 0;
 
     static final int DEFAULT_DRAWER_TYPE = 0;
-    static final int ALL_DRAWER_TYPE = 1;
-    static final int ADD_DRAWER_TYPE = 2;
+    public static final int ALL_DRAWER_TYPE = 1;
+    public static final int ADD_DRAWER_TYPE = 2;
 
     private int spec = DEFAULT_DRAWER_TYPE;
 
-    DrawerModel(String name) {
+    public DrawerModel(String name) {
         this.name = name;
     }
 
@@ -49,11 +49,11 @@ public class DrawerModel implements Parcelable {
         this.name = name;
     }
 
-    void setCount(int count) {
+    public void setCount(int count) {
         this.count = count;
     }
 
-    int getCount() {
+    public int getCount() {
         return count;
     }
 

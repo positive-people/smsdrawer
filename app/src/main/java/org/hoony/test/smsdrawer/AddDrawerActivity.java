@@ -8,9 +8,9 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.Toast;
 
-import java.util.ArrayList;
+import org.hoony.test.smsdrawer.model.DrawerModel;
 
-import static org.hoony.test.smsdrawer.SideAdapter.EXTRA_DRAWER_MODEL;
+import static org.hoony.test.smsdrawer.adapter.SideAdapter.EXTRA_DRAWER_MODEL;
 
 public class AddDrawerActivity extends AppCompatActivity {
     private EditText mEditDrawerName;

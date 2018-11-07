@@ -7,25 +7,25 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
-import android.support.v4.app.LoaderManager;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.widget.DrawerLayout;
-import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 
-import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.Toast;
+
+import org.hoony.test.smsdrawer.model.DrawerModel;
+import org.hoony.test.smsdrawer.model.MsgModel;
+import org.hoony.test.smsdrawer.adapter.MsgAdapter;
+import org.hoony.test.smsdrawer.adapter.SideAdapter;
 
 import java.util.ArrayList;
 
-import static org.hoony.test.smsdrawer.SideAdapter.EXTRA_DRAWER_MODEL;
+import static org.hoony.test.smsdrawer.adapter.SideAdapter.EXTRA_DRAWER_MODEL;
 
 public class MainActivity extends AppCompatActivity {
     private RecyclerView mMainRecyclerView;
@@ -37,6 +37,7 @@ public class MainActivity extends AppCompatActivity {
     private RecyclerView.LayoutManager mSideLayoutManager;
     private ArrayList<DrawerModel> drawers = new ArrayList<>();
     private DrawerLayout mDrawerLayout;
+    private int selectedDrawerPosition = 0;
 
     public final static String EXTRA_MSG_MODEL = "org.hoony.test.smsdrawer.MSG_MODEL";
 
@@ -46,8 +47,8 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         drawers.add(new DrawerModel("전체"));
-        drawers.add(new DrawerModel("학교"));
-        drawers.add(new DrawerModel("결제"));
+//        drawers.add(new DrawerModel("학교"));
+//        drawers.add(new DrawerModel("결제"));
         drawers.add(new DrawerModel("서랍 추가"));
 
         drawers.get(0).setSpec(DrawerModel.ALL_DRAWER_TYPE);
@@ -162,21 +163,30 @@ public class MainActivity extends AppCompatActivity {
         if (resultCode == RESULT_OK && requestCode == 0) {
             DrawerModel model = data.getParcelableExtra(EXTRA_DRAWER_MODEL);
             drawers.add(drawers.size()-1, model);
-            Log.i("Model", model.getName());
-            Log.i("Model", model.getKeywords().toString());
-            Log.i("Model", model.getNumbers().toString());
             mSideAdapter.notifyItemInserted(drawers.size()-2);
         }
     }
 
-    void readSMS() {
+    public void readSMS() {
         Uri uri = Uri.parse("content://sms");
-        Cursor mCursor = getContentResolver().query(uri, null, "1=1) GROUP BY (address", null, null);
+        String criteria = "";
+        for(int i = 0; i < drawers.get(getSelectedDrawerPosition()).getKeywords().size(); i ++) {
+            criteria += "body LIKE '%" + drawers.get(getSelectedDrawerPosition()).getKeywords().get(i) + "%' OR ";
+        }
+        for(int i = 0; i < drawers.get(getSelectedDrawerPosition()).getNumbers().size(); i ++) {
+            criteria += "address LIKE '%" + drawers.get(getSelectedDrawerPosition()).getNumbers().get(i) + "%' OR ";
+        }
+        if(drawers.get(getSelectedDrawerPosition()).getSpec() == DrawerModel.ALL_DRAWER_TYPE || criteria.equals("")) {
+            criteria = "1=1 OR ";
+        }
+        criteria += "1=0) GROUP BY (address";
+        Cursor mCursor = getContentResolver().query(uri, null, criteria, null, null);
 
         if(mCursor == null) return;
         int bodyIndex = mCursor.getColumnIndex("body");
         int addressIndex = mCursor.getColumnIndex("address");
         int dateIndex = mCursor.getColumnIndex("date");
+        dataSet.clear();
         for(mCursor.moveToFirst();!mCursor.isAfterLast();mCursor.moveToNext()) {
             dataSet.add(new MsgModel(null, mCursor.getString(bodyIndex), mCursor.getString(dateIndex), mCursor.getString(addressIndex),null));
         }
@@ -205,5 +215,23 @@ public class MainActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
+    public void closeSideDrawer() {
+        if (mDrawerLayout.isDrawerOpen(mSideRecyclerView)) mDrawerLayout.closeDrawer(mSideRecyclerView);
+    }
 
+    public void notifyChanged(int pos) {
+        mSideAdapter.notifyItemChanged(pos);
+    }
+
+    public int getSelectedDrawerPosition() {
+        return selectedDrawerPosition;
+    }
+
+    public void setSelectedDrawerPosition(int selectedDrawerPosition) {
+        this.selectedDrawerPosition = selectedDrawerPosition;
+    }
+
+    public DrawerModel getCurrentDrawerModel() {
+        return drawers.get(getSelectedDrawerPosition());
+    }
 }

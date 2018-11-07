@@ -1,13 +1,10 @@
-package org.hoony.test.smsdrawer;
+package org.hoony.test.smsdrawer.adapter;
 
-import android.app.Activity;
-import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Color;
 import android.net.Uri;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
@@ -15,7 +12,10 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import java.util.ArrayList;
+import org.hoony.test.smsdrawer.AddDrawerActivity;
+import org.hoony.test.smsdrawer.MainActivity;
+import org.hoony.test.smsdrawer.model.DrawerModel;
+import org.hoony.test.smsdrawer.R;
 
 public class SideAdapter extends RecyclerView.Adapter<SideAdapter.SideViewHolder> {
     private MainActivity main;
@@ -45,7 +45,7 @@ public class SideAdapter extends RecyclerView.Adapter<SideAdapter.SideViewHolder
                 view.setBackgroundColor(Color.LTGRAY);
                 return true;
             } else if (motionEvent.getAction() == MotionEvent.ACTION_OUTSIDE || motionEvent.getAction() == MotionEvent.ACTION_CANCEL) {
-                view.setBackgroundColor(Color.WHITE);
+                view.setBackgroundColor(getAdapterPosition() == main.getSelectedDrawerPosition() ? Color.rgb(255, 238, 187) : Color.WHITE);
                 return false;
             } else if (motionEvent.getAction() == MotionEvent.ACTION_UP && main.getDrawers().get(getAdapterPosition()).getSpec() == DrawerModel.ADD_DRAWER_TYPE) {
                 view.setBackgroundColor(Color.WHITE);
@@ -53,7 +53,12 @@ public class SideAdapter extends RecyclerView.Adapter<SideAdapter.SideViewHolder
                 main.startActivityForResult(intent, 0);
                 return false;
             } else if (motionEvent.getAction() == MotionEvent.ACTION_UP) {
-                view.setBackgroundColor(Color.WHITE);
+                int prev = main.getSelectedDrawerPosition();
+                main.setSelectedDrawerPosition(getAdapterPosition());
+                main.readSMS();
+                main.notifyChanged(prev);
+                view.setBackgroundColor(getAdapterPosition() == main.getSelectedDrawerPosition() ? Color.rgb(255, 238, 187) : Color.WHITE);
+                main.closeSideDrawer();
                 return false;
             }
             return false;
@@ -84,6 +89,7 @@ public class SideAdapter extends RecyclerView.Adapter<SideAdapter.SideViewHolder
         } else {
             holder.mViewLine.setVisibility(View.VISIBLE);
         }
+        holder.drawerView.setBackgroundColor(position == main.getSelectedDrawerPosition() ? Color.rgb(255, 238, 187) : Color.WHITE);
     }
 
     void setMsgCount(int position) {
@@ -97,7 +103,21 @@ public class SideAdapter extends RecyclerView.Adapter<SideAdapter.SideViewHolder
             } else if (model.getSpec() == DrawerModel.ADD_DRAWER_TYPE) {
                 model.setCount(0);
             } else {
-                model.setCount(position*10);
+                String criteria = "";
+                for(int i = 0; i < model.getKeywords().size(); i ++) {
+                    criteria += "body LIKE '%" + model.getKeywords().get(i) + "%' OR ";
+                }
+                for(int i = 0; i < model.getNumbers().size(); i ++) {
+                    criteria += "address LIKE '%" + model.getNumbers().get(i) + "%' OR ";
+                }
+                if(model.getSpec() == DrawerModel.ALL_DRAWER_TYPE || criteria.equals("")) {
+                    criteria = "1=1 OR ";
+                }
+                criteria += "1=0";
+                Cursor mCursor = main.getContentResolver().query(uri, null, criteria, null, null);
+                if (mCursor == null) return;
+                model.setCount(mCursor.getCount());
+                mCursor.close();
             }
     }
 

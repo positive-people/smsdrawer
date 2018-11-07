@@ -1,4 +1,4 @@
-package org.hoony.test.smsdrawer;
+package org.hoony.test.smsdrawer.model;
 
 import android.net.Uri;
 import android.os.Parcel;
@@ -11,7 +11,7 @@ public class MsgModel implements Parcelable {
     private String phoneNumber;
     private Uri profile;
 
-    MsgModel(String name, String content, String time, String phoneNumber, Uri profile) {
+    public MsgModel(String name, String content, String time, String phoneNumber, Uri profile) {
         this.name = name;
         this.content = content;
         this.time = time;
@@ -39,21 +39,21 @@ public class MsgModel implements Parcelable {
         }
     };
 
-    String getName() {
+    public String getName() {
         return name;
     }
 
-    String getContent() {
+    public String getContent() {
         return content;
     }
 
-    String getTime() {
+    public String getTime() {
         return time;
     }
 
-    String getPhoneNumber() { return phoneNumber; }
+    public String getPhoneNumber() { return phoneNumber; }
 
-    Uri getProfile() {
+    public Uri getProfile() {
         return profile;
     }
 
@@ -61,7 +61,7 @@ public class MsgModel implements Parcelable {
         this.name = name;
     }
 
-    void setProfile(Uri profile) {
+    public void setProfile(Uri profile) {
         this.profile = profile;
     }
 

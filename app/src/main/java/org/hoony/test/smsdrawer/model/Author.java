@@ -1,4 +1,4 @@
-package org.hoony.test.smsdrawer;
+package org.hoony.test.smsdrawer.model;
 
 import com.stfalcon.chatkit.commons.models.IUser;
 

@@ -1,4 +1,4 @@
-package org.hoony.test.smsdrawer;
+package org.hoony.test.smsdrawer.adapter;
 
 import android.Manifest;
 import android.app.Activity;
@@ -21,15 +21,21 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import org.hoony.test.smsdrawer.MainActivity;
+import org.hoony.test.smsdrawer.MessagesActivity;
+import org.hoony.test.smsdrawer.model.MsgModel;
+import org.hoony.test.smsdrawer.R;
+
 import java.sql.Date;
 import java.util.ArrayList;
 import java.util.Locale;
 
 import static org.hoony.test.smsdrawer.MainActivity.EXTRA_MSG_MODEL;
+import static org.hoony.test.smsdrawer.adapter.SideAdapter.EXTRA_DRAWER_MODEL;
 
 public class MsgAdapter extends RecyclerView.Adapter<MsgAdapter.MyViewHolder> {
     private ArrayList<MsgModel> mDataset;
-    private Activity main;
+    private MainActivity main;
     private Drawable defaultImage;
 
     class MyViewHolder extends RecyclerView.ViewHolder implements View.OnTouchListener {
@@ -63,6 +69,7 @@ public class MsgAdapter extends RecyclerView.Adapter<MsgAdapter.MyViewHolder> {
                 view.setBackgroundColor(Color.rgb(250,250,250));
                 Intent intent = new Intent(main, MessagesActivity.class);
                 intent.putExtra(EXTRA_MSG_MODEL, mDataset.get(getAdapterPosition()));
+                intent.putExtra(EXTRA_DRAWER_MODEL, main.getCurrentDrawerModel());
                 main.startActivity(intent);
                 return false;
             }
@@ -70,12 +77,12 @@ public class MsgAdapter extends RecyclerView.Adapter<MsgAdapter.MyViewHolder> {
         }
     }
 
-    void setMain(Activity main) {
+    public void setMain(MainActivity main) {
         this.main = main;
         defaultImage = main.getResources().getDrawable(R.drawable.ic_launcher_background);
     }
 
-    MsgAdapter(ArrayList<MsgModel> myDataSet) {
+    public MsgAdapter(ArrayList<MsgModel> myDataSet) {
         mDataset = myDataSet;
     }
 
