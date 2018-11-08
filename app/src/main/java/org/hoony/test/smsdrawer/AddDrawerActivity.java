@@ -5,12 +5,15 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
 import org.hoony.test.smsdrawer.model.DrawerModel;
 
 import static org.hoony.test.smsdrawer.adapter.SideAdapter.EXTRA_DRAWER_MODEL;
+import static org.hoony.test.smsdrawer.adapter.SideAdapter.EXTRA_SELECTED_DRAWER;
+import static org.hoony.test.smsdrawer.adapter.SideAdapter.EXTRA_SELECTED_POSITION;
 
 public class AddDrawerActivity extends AppCompatActivity {
     private EditText mEditDrawerName;
@@ -20,12 +23,17 @@ public class AddDrawerActivity extends AppCompatActivity {
     private EditText mEditNumber1;
     private EditText mEditNumber2;
     private EditText mEditNumber3;
+    private DrawerModel selectedDrawer;
+    private int selectedPosition;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_drawer);
         getSupportActionBar().setTitle("서랍 추가");
+        Intent intent = getIntent();
+        selectedDrawer = intent.getParcelableExtra(EXTRA_SELECTED_DRAWER);
+        selectedPosition = intent.getIntExtra(EXTRA_SELECTED_POSITION, 999999999);
 
         mEditDrawerName = findViewById(R.id.editDrawerName);
         mEditKeyword1 = findViewById(R.id.editKeyword1);
@@ -34,6 +42,27 @@ public class AddDrawerActivity extends AppCompatActivity {
         mEditNumber1 = findViewById(R.id.editNumber1);
         mEditNumber2 = findViewById(R.id.editNumber2);
         mEditNumber3 = findViewById(R.id.editNumber3);
+
+        if (selectedDrawer != null) {
+            mEditDrawerName.setText(selectedDrawer.getName());
+            for (int i = 0; i < selectedDrawer.getKeywords().size(); i++) {
+                if (i == 0)
+                    mEditKeyword1.setText(selectedDrawer.getKeywords().get(i));
+                if (i == 1)
+                    mEditKeyword2.setText(selectedDrawer.getKeywords().get(i));
+                if (i == 2)
+                    mEditKeyword3.setText(selectedDrawer.getKeywords().get(i));
+            }
+            for (int i = 0; i < selectedDrawer.getNumbers().size(); i++) {
+                if (i == 0)
+                    mEditNumber1.setText(selectedDrawer.getNumbers().get(i));
+                if (i == 1)
+                    mEditNumber2.setText(selectedDrawer.getNumbers().get(i));
+                if (i == 2)
+                    mEditNumber3.setText(selectedDrawer.getNumbers().get(i));
+            }
+            ((Button)findViewById(R.id.button_add_drawer)).setText("수정");
+        }
     }
 
     public void addDrawer(View v) {
@@ -65,9 +94,7 @@ public class AddDrawerActivity extends AppCompatActivity {
             model.addNumber(mEditNumber3.getText().toString());
         Intent intent = new Intent();
         intent.putExtra(EXTRA_DRAWER_MODEL, model);
-        Log.i("Model", model.getName());
-        Log.i("Model", model.getKeywords().toString());
-        Log.i("Model", model.getNumbers().toString());
+        intent.putExtra(EXTRA_SELECTED_POSITION, selectedPosition);
         setResult(RESULT_OK, intent);
         finish();
     }

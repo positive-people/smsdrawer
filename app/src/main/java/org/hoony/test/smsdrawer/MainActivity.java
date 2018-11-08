@@ -27,6 +27,7 @@ import org.hoony.test.smsdrawer.adapter.SideAdapter;
 import java.util.ArrayList;
 
 import static org.hoony.test.smsdrawer.adapter.SideAdapter.EXTRA_DRAWER_MODEL;
+import static org.hoony.test.smsdrawer.adapter.SideAdapter.EXTRA_SELECTED_POSITION;
 
 public class MainActivity extends AppCompatActivity {
     private RecyclerView mMainRecyclerView;
@@ -48,8 +49,35 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         drawers.add(new DrawerModel("전체"));
-//        drawers.add(new DrawerModel("학교"));
-//        drawers.add(new DrawerModel("결제"));
+        DrawerModel jeju = new DrawerModel("제주대");
+        jeju.addNumber("0647542306");
+        jeju.addNumber("0647544475");
+        jeju.addNumber("0647543095");
+        jeju.addNumber("0647542037");
+        jeju.addNumber("0647542303");
+        jeju.addNumber("0647542304");
+        jeju.addNumber("0647548243");
+        jeju.addNumber("0647542204");
+        jeju.addNumber("0647548211");
+        jeju.addNumber("0647542291");
+        jeju.addNumber("0647548261");
+        jeju.addNumber("0647542057");
+        jeju.addNumber("0647548268");
+        jeju.addNumber("0647542023");
+        jeju.addNumber("0647543650");
+        jeju.addNumber("0647542292");
+        jeju.addNumber("0647542053");
+        jeju.addNumber("0647548265");
+        jeju.addNumber("0647544415");
+        jeju.addNumber("0647542097");
+        drawers.add(jeju);
+
+        DrawerModel purc = new DrawerModel("결제");
+        purc.addKeyword("결제금액");
+        purc.addKeyword("결제가 완료");
+        purc.addKeyword("체크승인");
+        purc.addKeyword("승인");
+        drawers.add(purc);
         drawers.add(new DrawerModel("✚"));
 
         drawers.get(0).setSpec(DrawerModel.ALL_DRAWER_TYPE);
@@ -163,8 +191,16 @@ public class MainActivity extends AppCompatActivity {
         super.onActivityResult(requestCode, resultCode, data);
         if (resultCode == RESULT_OK && requestCode == 0) {
             DrawerModel model = data.getParcelableExtra(EXTRA_DRAWER_MODEL);
-            drawers.add(drawers.size()-1, model);
-            mSideAdapter.notifyItemInserted(drawers.size()-2);
+            int position = data.getIntExtra(EXTRA_SELECTED_POSITION, 999999999);
+            if (position == 999999999) {
+                drawers.add(drawers.size() - 1, model);
+                mSideAdapter.notifyItemInserted(drawers.size()-2);
+            } else {
+                drawers.set(position, model);
+                mSideAdapter.notifyItemChanged(position);
+                if (position == getSelectedDrawerPosition())
+                    readSMS();
+            }
         }
     }
 
@@ -181,7 +217,7 @@ public class MainActivity extends AppCompatActivity {
             criteria = "1=1 OR ";
         }
         criteria += "1=0) GROUP BY (address";
-        Cursor mCursor = getContentResolver().query(uri, null, criteria, null, null);
+        Cursor mCursor = getContentResolver().query(uri, null, criteria, null, "max(date) DESC");
 
         if (mCursor == null) return;
         int bodyIndex = mCursor.getColumnIndex("body");
@@ -252,5 +288,24 @@ public class MainActivity extends AppCompatActivity {
 
     public DrawerModel getCurrentDrawerModel() {
         return drawers.get(getSelectedDrawerPosition());
+    }
+
+    public void deleteDrawer(int position) {
+        boolean change = position == getSelectedDrawerPosition();
+        boolean adjust = position < getSelectedDrawerPosition();
+        if (drawers.get(position).getSpec() != DrawerModel.ALL_DRAWER_TYPE && drawers.get(position).getSpec() != DrawerModel.ADD_DRAWER_TYPE) {
+            drawers.remove(position);
+            mSideAdapter.notifyItemRemoved(position);
+        }
+        if (drawers.size() >= getSelectedDrawerPosition() + 1) {
+            setSelectedDrawerPosition(drawers.size()-2);
+            mSideAdapter.notifyItemChanged(getSelectedDrawerPosition());
+        }
+        if (change) {
+            readSMS();
+            mSideAdapter.notifyItemChanged(getSelectedDrawerPosition());
+        } else if (adjust) {
+            setSelectedDrawerPosition(getSelectedDrawerPosition()-1);
+        }
     }
 }

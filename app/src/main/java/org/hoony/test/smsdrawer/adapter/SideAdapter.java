@@ -1,12 +1,16 @@
 package org.hoony.test.smsdrawer.adapter;
 
 import android.Manifest;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.net.Uri;
+import android.os.Handler;
+import android.os.Message;
 import android.provider.Telephony;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
@@ -14,6 +18,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.ViewConfiguration;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -27,6 +32,8 @@ public class SideAdapter extends RecyclerView.Adapter<SideAdapter.SideViewHolder
     private MainActivity main;
 
     public static final String EXTRA_DRAWER_MODEL = "org.hoony.test.smsdrawer.DRAWER_MODEL";
+    public static final String EXTRA_SELECTED_DRAWER = "org.hoony.test.smsdrawer.SELECTED_DRAWER";
+    public static final String EXTRA_SELECTED_POSITION = "org.hoony.test.smsdrawer.SELECTED_POSITION";
 
     public class SideViewHolder extends RecyclerView.ViewHolder implements View.OnTouchListener {
         public TextView mTextName;
@@ -34,6 +41,13 @@ public class SideAdapter extends RecyclerView.Adapter<SideAdapter.SideViewHolder
         public TextView mTextCount;
         public View mViewLine;
         public View drawerView;
+        private Handler mHandler;
+        private float x;
+        private float y;
+        private boolean isActive = true;
+
+        private final int LONGPRESS_TIMEOUT = ViewConfiguration.getLongPressTimeout();
+        private final int TAP_TIMEOUT = ViewConfiguration.getTapTimeout();
 
         public SideViewHolder(View drawerView) {
             super(drawerView);
@@ -41,24 +55,34 @@ public class SideAdapter extends RecyclerView.Adapter<SideAdapter.SideViewHolder
             mImage = drawerView.findViewById(R.id.image);
             mTextCount = drawerView.findViewById(R.id.text_count);
             mViewLine = drawerView.findViewById(R.id.view_line);
+            mHandler = new keyHandler();
             this.drawerView = drawerView;
             drawerView.setOnTouchListener(this);
+            //drawerView.setOnLongClickListener(this);
         }
 
         @Override
         public boolean onTouch(View view, MotionEvent motionEvent) {
+            if (!isActive) return false;
             if (motionEvent.getAction() == MotionEvent.ACTION_DOWN) {
                 view.setBackgroundColor(Color.LTGRAY);
+                mHandler.removeMessages(3);
+                if (main.getDrawers().get(getAdapterPosition()).getSpec() != DrawerModel.ALL_DRAWER_TYPE && main.getDrawers().get(getAdapterPosition()).getSpec() != DrawerModel.ADD_DRAWER_TYPE)
+                    mHandler.sendEmptyMessageAtTime(3, motionEvent.getDownTime()+ TAP_TIMEOUT + LONGPRESS_TIMEOUT);
+                x = motionEvent.getX();
+                y = motionEvent.getY();
                 return true;
             } else if (motionEvent.getAction() == MotionEvent.ACTION_OUTSIDE || motionEvent.getAction() == MotionEvent.ACTION_CANCEL) {
                 view.setBackgroundColor(getAdapterPosition() == main.getSelectedDrawerPosition() ? Color.rgb(255, 238, 187) : Color.WHITE);
                 mTextName.setTypeface(null, getAdapterPosition() == main.getSelectedDrawerPosition() ? Typeface.BOLD : Typeface.NORMAL);
+                mHandler.removeMessages(3);
                 return false;
             } else if (motionEvent.getAction() == MotionEvent.ACTION_UP && main.getDrawers().get(getAdapterPosition()).getSpec() == DrawerModel.ADD_DRAWER_TYPE) {
                 view.setBackgroundColor(Color.WHITE);
                 mTextName.setTypeface(null, Typeface.NORMAL);
                 Intent intent = new Intent(main, AddDrawerActivity.class);
                 main.startActivityForResult(intent, 0);
+                mHandler.removeMessages(3);
                 return false;
             } else if (motionEvent.getAction() == MotionEvent.ACTION_UP) {
                 int prev = main.getSelectedDrawerPosition();
@@ -68,9 +92,45 @@ public class SideAdapter extends RecyclerView.Adapter<SideAdapter.SideViewHolder
                 view.setBackgroundColor(getAdapterPosition() == main.getSelectedDrawerPosition() ? Color.rgb(255, 238, 187) : Color.WHITE);
                 mTextName.setTypeface(null, getAdapterPosition() == main.getSelectedDrawerPosition() ? Typeface.BOLD : Typeface.NORMAL);
                 main.closeSideDrawer();
-                return false;
+                mHandler.removeMessages(3);
+                return true;
+            } else if (motionEvent.getAction() == MotionEvent.ACTION_MOVE) {
+                if ((x-motionEvent.getX())*(x-motionEvent.getX())+(y-motionEvent.getY())*(y-motionEvent.getY()) > 1000)
+                    mHandler.removeMessages(3);
             }
             return false;
+        }
+
+        private class keyHandler extends Handler {
+
+
+
+            public void handleMessage(Message msg){
+                switch(msg.what){
+                    case 3:
+                        isActive = false;
+                        AlertDialog.Builder builder = new AlertDialog.Builder(main);
+                        builder.setCancelable(false);
+                        builder.setTitle(main.getDrawers().get(getAdapterPosition()).getName());
+                        builder.setItems(new String[]{"수정", "삭제"}, new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+                                isActive = true;
+                                if (i == 0) {
+                                    Intent intent = new Intent(main, AddDrawerActivity.class);
+                                    intent.putExtra(EXTRA_SELECTED_DRAWER, main.getDrawers().get(getAdapterPosition()));
+                                    intent.putExtra(EXTRA_SELECTED_POSITION, getAdapterPosition());
+                                    main.startActivityForResult(intent, 0);
+                                } else if (i == 1) {
+                                    main.deleteDrawer(getAdapterPosition());
+                                }
+                            }
+                        });
+                        builder.create().show();
+
+                        break;
+                }
+            }
         }
     }
 
