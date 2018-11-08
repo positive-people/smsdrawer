@@ -80,7 +80,7 @@ public class MsgAdapter extends RecyclerView.Adapter<MsgAdapter.MyViewHolder> {
 
     public void setMain(MainActivity main) {
         this.main = main;
-        defaultImage = main.getResources().getDrawable(R.drawable.ic_launcher_background);
+        defaultImage = main.getResources().getDrawable(R.drawable.ic_default_person);
     }
 
     public MsgAdapter(ArrayList<MsgModel> myDataSet) {
@@ -129,7 +129,7 @@ public class MsgAdapter extends RecyclerView.Adapter<MsgAdapter.MyViewHolder> {
                 holder.mImageProfile.setImageDrawable(defaultImage);
 
             } else {
-                holder.mImageProfile.setImageResource(R.drawable.ic_launcher_background);
+                holder.mImageProfile.setImageResource(R.drawable.ic_default_person);
 
             }
             if(mDataset.get(position).getName() != null && !mDataset.get(position).getName().isEmpty()) {

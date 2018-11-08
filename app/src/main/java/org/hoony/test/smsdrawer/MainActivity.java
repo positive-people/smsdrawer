@@ -50,7 +50,7 @@ public class MainActivity extends AppCompatActivity {
         drawers.add(new DrawerModel("전체"));
 //        drawers.add(new DrawerModel("학교"));
 //        drawers.add(new DrawerModel("결제"));
-        drawers.add(new DrawerModel("서랍 추가"));
+        drawers.add(new DrawerModel("✚"));
 
         drawers.get(0).setSpec(DrawerModel.ALL_DRAWER_TYPE);
         drawers.get(drawers.size()-1).setSpec(DrawerModel.ADD_DRAWER_TYPE);

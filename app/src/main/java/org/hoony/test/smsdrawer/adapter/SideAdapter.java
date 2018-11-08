@@ -7,8 +7,10 @@ import android.database.Cursor;
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.net.Uri;
+import android.provider.Telephony;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
@@ -98,22 +100,29 @@ public class SideAdapter extends RecyclerView.Adapter<SideAdapter.SideViewHolder
         }
         holder.drawerView.setBackgroundColor(position == main.getSelectedDrawerPosition() ? Color.rgb(255, 238, 187) : Color.WHITE);
             holder.mTextName.setTypeface(null, position == main.getSelectedDrawerPosition() ? Typeface.BOLD : Typeface.NORMAL);
+            if (main.getDrawers().get(position).getSpec() == DrawerModel.ADD_DRAWER_TYPE) {
+                holder.mTextName.setTextAlignment(View.TEXT_ALIGNMENT_CENTER);
+            } else {
+                holder.mTextName.setTextAlignment(View.TEXT_ALIGNMENT_INHERIT);
+            }
     }
 
     void setMsgCount(int position) {
         if (ContextCompat.checkSelfPermission(main,
                 Manifest.permission.READ_SMS)
                 != PackageManager.PERMISSION_GRANTED) return;
-        Uri uri = Uri.parse("content://sms");
+        Uri smsUri = Uri.parse("content://sms/");
         DrawerModel model = main.getDrawers().get(position);
             if (model.getSpec() == DrawerModel.ALL_DRAWER_TYPE) {
-                Cursor mCursor = main.getContentResolver().query(uri, null, null, null, null);
-                if (mCursor == null) return;
-                model.setCount(mCursor.getCount());
-                mCursor.close();
+                Cursor smsCursor = main.getContentResolver().query(smsUri, null, null, null, null);
+                if (smsCursor == null) return;
+                model.setCount(smsCursor.getCount());
+
+                smsCursor.close();
             } else if (model.getSpec() == DrawerModel.ADD_DRAWER_TYPE) {
                 model.setCount(0);
             } else {
+                int count = 0;
                 String criteria = "";
                 for(int i = 0; i < model.getKeywords().size(); i ++) {
                     criteria += "body LIKE '%" + model.getKeywords().get(i) + "%' OR ";
@@ -125,9 +134,11 @@ public class SideAdapter extends RecyclerView.Adapter<SideAdapter.SideViewHolder
                     criteria = "1=1 OR ";
                 }
                 criteria += "1=0";
-                Cursor mCursor = main.getContentResolver().query(uri, null, criteria, null, null);
+                Cursor mCursor = main.getContentResolver().query(smsUri, null, criteria, null, null);
                 if (mCursor == null) return;
-                model.setCount(mCursor.getCount());
+                count += mCursor.getCount();
+
+                model.setCount(count);
                 mCursor.close();
             }
     }
