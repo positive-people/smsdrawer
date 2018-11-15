@@ -9,6 +9,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.telephony.SmsManager;
 import android.util.Log;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.ImageView;
 import android.widget.Toast;
@@ -38,6 +39,7 @@ public class MessagesActivity extends AppCompatActivity {
     private MessageInput inputView;
     private DrawerModel drawer;
     public static final String SENDER_ID = "org.hoony.test.smsdrawer.SENDER";
+    private  Menu menu;
 
     ImageLoader imageLoader = new ImageLoader() {
         @Override
@@ -85,18 +87,29 @@ public class MessagesActivity extends AppCompatActivity {
             }
 
         });
-
     }
 
+    //액션바 표시
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu){
+        this.menu = menu;
+        getMenuInflater().inflate(R.menu.menu, menu);
+        return true;
+    }
     //액션바 액션 이벤트 처리
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        int id = item.getItemId();
-        if (id == android.R.id.home) {
-            finish();
+        switch (item.getItemId()){
+            case android.R.id.home:{
+                finish();
+            }
+            case R.id.action_delete:{
+                adapter.deleteSelectedMessages();
+                //getContentResolver().delete();
+                Toast.makeText(this, "정상적으로 삭제 되었습니다.", Toast.LENGTH_SHORT).show();
+                break;
+            }
         }
-
-
         return super.onOptionsItemSelected(item);
     }
 
