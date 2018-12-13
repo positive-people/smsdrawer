@@ -23,7 +23,7 @@ android:layout_height="match_parent">
             android:divider="@android:color/transparent"
             android:dividerHeight="0dp"
             android:background="#fff"
-            android:layout_width="120dp"
+            android:layout_width="140dp"
             android:layout_height="match_parent"
             tools:listitem="@layout/drawer_item" />
 </android.support.v4.widget.DrawerLayout>
