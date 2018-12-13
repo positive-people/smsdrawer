@@ -77,8 +77,16 @@ public class MyBroadcastReceiver extends BroadcastReceiver {
                     .setDefaults(Notification.DEFAULT_SOUND)
                     .setPriority(Notification.PRIORITY_MAX)
                     .setContentIntent(mPendingIntent)
+                    .setNumber(1)
                     .setAutoCancel(true);
 
+            Intent bi = new Intent("android.intent.action.BADGE_COUNT_UPDATE");
+            // 패키지 네임과 클래스 네임 설정
+            bi.putExtra("badge_count_package_name", "org.hoony.test.smsdrawer");
+            bi.putExtra("badge_count_class_name", "MessagesActivity");
+            // 업데이트 카운트
+            bi.putExtra("badge_count", 1);
+            context.sendBroadcast(bi);
             mNotificationManager.notify(Integer.parseInt(num), mBuilder.build());
         }
     }
