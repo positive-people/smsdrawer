@@ -7,11 +7,15 @@
 - @z-hoony
 - @daydeiday
 
-## 오픈소스 프로젝트 
-
-- <SMS Drawer>
+## 오픈소스 프로젝트
+- SMS Drawer
 - <https://github.com/positive-people/smsdrawer>
+- <Apache-2.0>
 - <Copyright (c) 2018 긍정왕>
+ 
+## 설치
+
+- ```git clone https://github.com/positive-people/smsdrawer.git```
 
 ## 조 목표 및 활동 계획
 
