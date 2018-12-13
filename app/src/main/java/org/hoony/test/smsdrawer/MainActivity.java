@@ -18,6 +18,7 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 
 import android.view.KeyEvent;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 
@@ -42,6 +43,7 @@ public class MainActivity extends AppCompatActivity {
     private ArrayList<DrawerModel> drawers = new ArrayList<>();
     private DrawerLayout mDrawerLayout;
     private int selectedDrawerPosition = 0;
+    private  Menu menu;
 
     public final static String EXTRA_MSG_MODEL = "org.hoony.test.smsdrawer.MSG_MODEL";
 
@@ -239,6 +241,14 @@ public class MainActivity extends AppCompatActivity {
         return drawers;
     }
 
+    //액션바 표시
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu){
+        this.menu = menu;
+        getMenuInflater().inflate(R.menu.main_menu, menu);
+        return true;
+    }
+
     //액션바 액션 이벤트 처리
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -250,6 +260,9 @@ public class MainActivity extends AppCompatActivity {
                 mDrawerLayout.openDrawer(mSideRecyclerView);
             }
             return true;
+        } else if(id == R.id.action_opensource) {
+            Intent intent = new Intent(this, OpensourceActivity.class);
+            startActivity(intent);
         }
         return super.onOptionsItemSelected(item);
     }
