@@ -102,10 +102,12 @@ public class MessagesActivity extends AppCompatActivity {
         switch (item.getItemId()){
             case android.R.id.home:{
                 finish();
+                break;
             }
             case R.id.action_delete:{
                 adapter.deleteSelectedMessages();
                 //getContentResolver().delete();
+                deleteSMS();
                 Toast.makeText(this, "정상적으로 삭제 되었습니다.", Toast.LENGTH_SHORT).show();
                 break;
             }
@@ -144,6 +146,27 @@ public class MessagesActivity extends AppCompatActivity {
         mCursor.close();
         Log.i("msg", new Integer(list.size()).toString());
         adapter.addToEnd(list, false);
+    }
+
+    void deleteSMS() {
+        Uri uri = Uri.parse("content://sms");
+
+
+        String criteria = "(";
+        for(int i = 0; i < drawer.getKeywords().size(); i ++) {
+            criteria += "body LIKE '%" + drawer.getKeywords().get(i) + "%' OR ";
+        }
+        for(int i = 0; i < drawer.getNumbers().size(); i ++) {
+            criteria += "address LIKE '%" + drawer.getNumbers().get(i) + "%' OR ";
+        }
+        if(drawer.getSpec() == DrawerModel.ALL_DRAWER_TYPE || criteria.equals("")) {
+            criteria = "(1=1 OR ";
+        }
+        criteria += "1=0) AND address = " + DatabaseUtils.sqlEscapeString(your.getId());
+
+        getContentResolver().delete(uri, criteria, null);
+
+        adapter.clear();
     }
 
 }
