@@ -155,7 +155,6 @@ public class MainActivity extends AppCompatActivity {
                 == PackageManager.PERMISSION_GRANTED) {
             //연락처 권한 받고 할 일
             mMainAdapter.notifyDataSetChanged();
-
         }
 
         // 액션바 홈 버튼 추가
