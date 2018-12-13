@@ -17,11 +17,9 @@ import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 
-import android.telephony.SmsMessage;
 import android.view.KeyEvent;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.Toast;
 
 import org.hoony.test.smsdrawer.model.DrawerModel;
 import org.hoony.test.smsdrawer.model.MsgModel;

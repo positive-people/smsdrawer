@@ -4,6 +4,7 @@ import android.Manifest;
 import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -17,6 +18,12 @@ import android.provider.ContactsContract;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.content.ContextCompat;
 import android.telephony.SmsMessage;
+
+import org.hoony.test.smsdrawer.model.DrawerModel;
+import org.hoony.test.smsdrawer.model.MsgModel;
+
+import static org.hoony.test.smsdrawer.MainActivity.EXTRA_MSG_MODEL;
+import static org.hoony.test.smsdrawer.adapter.SideAdapter.EXTRA_DRAWER_MODEL;
 
 public class MyBroadcastReceiver extends BroadcastReceiver {
     @Override
@@ -46,7 +53,7 @@ public class MyBroadcastReceiver extends BroadcastReceiver {
             String NOTIFICATION_CHANNEL_ID = "my_channel_id_01";
 
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                NotificationChannel notificationChannel = new NotificationChannel(NOTIFICATION_CHANNEL_ID, "My Notifications", NotificationManager.IMPORTANCE_NONE);
+                NotificationChannel notificationChannel = new NotificationChannel(NOTIFICATION_CHANNEL_ID, "My Notifications", NotificationManager.IMPORTANCE_DEFAULT);
                 notificationChannel.setDescription("Channel description");
                 notificationChannel.enableLights(true);
                 notificationChannel.setLightColor(Color.RED);
@@ -54,6 +61,13 @@ public class MyBroadcastReceiver extends BroadcastReceiver {
                 notificationChannel.enableVibration(true);
                 mNotificationManager.createNotificationChannel(notificationChannel);
             }
+            Intent ni = new Intent(context, MessagesActivity.class);
+            MsgModel mm = new MsgModel(str, str1, "0", num, null);
+            DrawerModel dm = new DrawerModel("전체");
+            dm.setSpec(DrawerModel.ALL_DRAWER_TYPE);
+            ni.putExtra(EXTRA_MSG_MODEL, mm);
+            ni.putExtra(EXTRA_DRAWER_MODEL, dm);
+            PendingIntent mPendingIntent = PendingIntent.getActivity(context, 0, ni, PendingIntent.FLAG_UPDATE_CURRENT);
 
             NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(context, NOTIFICATION_CHANNEL_ID)
                     .setSmallIcon(R.mipmap.ic_launcher_round)
@@ -61,17 +75,15 @@ public class MyBroadcastReceiver extends BroadcastReceiver {
                     .setContentText(str1)
                     .setDefaults(Notification.DEFAULT_VIBRATE)
                     .setDefaults(Notification.DEFAULT_SOUND)
-                    .setPriority(Notification.PRIORITY_DEFAULT)
+                    .setPriority(Notification.PRIORITY_MAX)
+                    .setContentIntent(mPendingIntent)
                     .setAutoCancel(true);
 
-
             mNotificationManager.notify(Integer.parseInt(num), mBuilder.build());
-
         }
     }
 
     private Cursor getContactName(final String phoneNumber, Context context)
-
     {
         if (ContextCompat.checkSelfPermission(context,
                 Manifest.permission.READ_CONTACTS)
