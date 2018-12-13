@@ -10,7 +10,7 @@
 ## 오픈소스 프로젝트 
 
 - <SMS Drawer>
-- <http://git.hoony.org/hoony/smsdrawer.git>
+- <https://github.com/positive-people/smsdrawer>
 - <Copyright (c) 2018 긍정왕>
 
 ## 조 목표 및 활동 계획
